@@ -35,7 +35,7 @@ bool DampingHumanoidController::loadDampingCfg() {
 // Update function called periodically
 void DampingHumanoidController::update(const ros::Time &time, const ros::Duration &period) {
   for (size_t i = 0; i < num_of_actuation(); i++) {
-    SingleJointCtrl(i, 0.0, 0, damping_kd_[i], 0.0, 0, 0);
+    SingleJointCtrl(i, 0, 0, 0, damping_kd_[i], 0, 0);
   }
 
   loop_count++;

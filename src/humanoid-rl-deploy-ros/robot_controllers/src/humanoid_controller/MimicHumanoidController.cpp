@@ -235,7 +235,7 @@ bool MimicHumanoidController::loadModel() {
 
     Ort::SessionOptions sessionOptions;
     sessionOptions.SetIntraOpNumThreads(1);
-    // sessionOptions.SetInterOpNumThreads(1);
+    sessionOptions.SetInterOpNumThreads(1);
 
     Ort::AllocatorWithDefaultOptions allocator;
 
