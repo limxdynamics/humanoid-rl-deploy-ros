@@ -1,12 +1,14 @@
-# 训练结果部署
+# 英文 | [中文](README_cn.md)
 
-### 1、部署环境配置
+# Deployment of Training Results
 
-- 安装ROS Noetic：我们推荐在Ubuntu 20.04操作系统上建立基于ROS Noetic的算法开发环境。ROS提供了一系列工具和库，极大地便利了机器人算法的开发、测试和部署。这些资源为用户提供了一个丰富而完整的算法开发环境。
+### 1. Deployment Environment Configuration
 
-  - ROS Noetic 安装请参考文档：https://wiki.ros.org/noetic/Installation/Ubuntu，选择“ros-noetic-desktop-full”进行安装。
+- Install ROS Noetic: We recommend setting up an algorithm development environment based on ROS Noetic on the Ubuntu 20.04 operating system. ROS provides a series of tools and libraries that greatly facilitate the development, testing, and deployment of robot algorithms. These resources offer users a rich and complete algorithm development environment.
 
-  - ROS Noetic 安装完成后，Bash终端输入以下Shell命令，安装开发环境所依赖的库：
+  - For ROS Noetic installation, please refer to the documentation: https://wiki.ros.org/noetic/Installation/Ubuntu, and select "ros-noetic-desktop-full" for installation.
+
+  - After installing ROS Noetic, enter the following Shell commands in the Bash terminal to install the libraries required for the development environment:
 
     ```
     sudo apt-get update
@@ -30,7 +32,7 @@
                      python3-pip libboost-all-dev libtbb-dev liburdfdom-dev liborocos-kdl-dev -y
     ```
 
-- 安装onnxruntime依赖，下载链接：https://github.com/microsoft/onnxruntime/releases/tag/v1.10.0 。请您根据自己的操作系统和平台选择合适版本下载。如在Ubuntu 20.04 x86_64，请按下面步骤进行安装：
+- Install onnxruntime dependencies. Download link: https://github.com/microsoft/onnxruntime/releases/tag/v1.10.0. Please select the appropriate version according to your operating system and platform. For Ubuntu 20.04 x86_64, follow these steps for installation:
 
   ```
   wget https://github.com/microsoft/onnxruntime/releases/download/v1.10.0/onnxruntime-linux-x64-1.10.0.tgz
@@ -41,31 +43,31 @@
   sudo cp -a onnxruntime-linux-x64-1.10.0/lib/* /usr/lib
   ```
 
-### 2、创建工作空间
+### 2. Create a Workspace
 
- 可以按照以下步骤，创建一个RL部署开发工作空间：
+ You can create an RL deployment development workspace by following these steps:
 
-- 打开一个Bash终端。
+- Open a Bash terminal.
 
-- 创建一个新目录来存放工作空间。例如，可以在用户的主目录下创建一个名为“limx_ws”的目录：
+- Create a new directory to store the workspace. For example, create a directory named "limx_ws" in the user's home directory:
   ```Bash
   mkdir -p ~/limx_ws
   ```
   
-- 下载 MuJoCo 仿真器
+- Download the MuJoCo simulator:
   ```Bash
   cd ~/limx_ws
   git clone --recurse git@github.com:limxdynamics/humanoid-mujoco-sim.git
   ```
   
-- 下载运动控制算法：
+- Download the motion control algorithm:
   ```Bash
   cd ~/limx_ws
   git clone --recurse git@github.com:limxdynamics/humanoid-rl-deploy-ros.git
   ```
   
-- 设置机器人型号：请参考“查看/设置机器人型号”章节，查看您的机器人型号。如果尚未设置，请按照以下步骤进行设置。
-  - 通过 Shell 命令 `tree -L 1 -P "humanoid_controllers" humanoid-rl-deploy-ros/robot_controllers/config/humanoid_controllers` 列出可用的机器人类型：
+- Set the robot model: If it is not set yet, follow these steps:
+  - List available robot types with the Shell command  `tree -L 1 -P "humanoid_controllers" humanoid-rl-deploy-ros/robot_controllers/config/humanoid_controllers`:
     
     ```
     cd ~/limx_ws/humanoid-rl-deploy-ros/src
@@ -74,70 +76,70 @@
     └── HU_D03_03
     ```
     
-  - 以`HU_D03_03`（请根据实际机器人类型进行替换）为例，设置机器人型号类型：
+  - Taking `HU_D03_03` (replace with your actual robot type) as an example, set the robot model type:
     
     ```
     echo 'export ROBOT_TYPE=HU_D03_03' >> ~/.bashrc && source ~/.bashrc
     ```
 
-### 3、仿真调试
+### 3. Simulation Debugging
 
-- 运行MuJoco 仿真器(推荐Python 3.8 及以上版本)
+- Run the MuJoCo simulator (Python 3.8 or higher is recommended):
 
-  - 打开一个 Bash 终端。
+  - Open a Bash terminal.
 
-  - 安装运动控制开发库：
-    - Linux x86_64 环境
+  - Install the motion control development library:
+    - For Linux x86_64 environment:
     
       ```bash
       cd ~/limx_ws
       pip install humanoid-mujoco-sim/limxsdk-lowlevel/python3/amd64/limxsdk-*-py3-none-any.whl
       ```
     
-    - Linux aarch64 环境
+    - For Linux aarch64 environment:
     
       ```bash
       cd ~/limx_ws
       pip install humanoid-mujoco-sim/limxsdksdk-lowlevel/python3/aarch64/limxsdk-*-py3-none-any.whl
       ```
     
-  - 运行 MuJoCo 仿真器：
+  - Run the MuJoCo simulator:
     
     ```bash
     cd ~/limx_ws
     python humanoid-mujoco-sim/simulator.py
     ```
 
-- 运行算法
+- Run the algorithm:
 
-  - 打开一个 Bash 终端。
+  - Open a Bash terminal.
 
-  - 请进到您的工作空间，完成编译：
+  - Navigate to your workspace and complete the compilation:
     
     ```bash
-    # 如您安装了Conda，请临时禁用 Conda 环境
-    # 因为 Conda 会干扰 ROS 的运行环境设置
+    # If you have Conda installed, temporarily disable the Conda environment
+    # because Conda may interfere with ROS environment settings
     conda deactivate
     
-    # 设置ROS编译环境
+    # Set up the ROS compilation environment
     source /opt/ros/noetic/setup.bash
     
-    # 编译算法代码
+    # Compile the algorithm code
     cd ~/limx_ws/humanoid-rl-deploy-ros
     catkin_make install
     ```
     
-  - 运行算法
+  - Run the algorithm:
     
     ```bash
-    # 如您安装了Conda，请临时禁用 Conda 环境
-    # 因为 Conda 会干扰 ROS 的运行环境设置
+    # If you have Conda installed, temporarily disable the Conda environment
+    # because Conda may interfere with ROS environment settings
     conda deactivate
     
-    # 设置ROS编译环境
+    # Set up the ROS compilation environment
     source /opt/ros/noetic/setup.bash
     
-    # 运行算法
+    # Run the algorithm
     cd ~/limx_ws/humanoid-rl-deploy-ros
     source install/setup.bash
     roslaunch robot_hw humanoid_hw_sim.launch
@@ -145,11 +147,11 @@
     
     ![](doc/simulator.gif)
 
-- 虚拟遥控器：仿真的时候可以使用虚拟遥控器来操作机器人。以下是使用虚拟遥控器的具体步骤。
+- Virtual Joystick: You can use a virtual joystick to operate the robot during simulation. Here are the specific steps to use the virtual joystick:
 
-  - 打开一个 Bash 终端。
+  - Open a Bash terminal.
 
-  - 运行虚拟遥控器
+  - Run the virtual joystick:
 
     ```
     ~/limx_ws/humanoid-mujoco-sim/robot-joystick/robot-joystick
@@ -158,60 +160,60 @@
     ![](doc/robot-joystick.png)
 
 
-  - 这时，您可以使用虚拟遥控器来控制机器人。
+  - At this point, you can use the virtual joystick to control the robot.
   
-    | **按键** | **模式**         | **说明**                                                    |
+    | **Button** | **Mode**         | **Description**                                                    |
     | -------- | ---------------- | ----------------------------------------------------------- |
-    | L1+Y     | 切换到站立模式   | 如机器人没法站立，请点击MuJoco界面中的“Reset”进行复位一下。 |
-    | L1+B     | 切换到打招呼模式 |                                                             |
+    | L1+Y     | Switch to Stand Mode  | If the robot cannot stand, click "Reset" in the MuJoCo interface to reset it. |
+    | L1+B     | Switch to Greeting Mode |                                                             |
 
-### 4、真机调试
+### 4. Real Robot Debugging
 
-- 设置您电脑IP：确保您的电脑与机器人本体通过外置网口连接。设置您的电脑IP地址为：`10.192.1.200`，并通过Shell命令`ping 10.192.1.2` 能够正常ping通。如下图所示对您的开发电脑进行IP设置：
+- Set your computer's IP: Ensure your computer is connected to the robot via the external network port. Set your computer's IP address to `10.192.1.200` and verify connectivity using the Shell command `ping 10.192.1.2`. Configure your development computer's IP as shown in the following figure:
 
   ![img](doc/ip.png)
 
-- 请进到您的工作空间，找到`humanoid_hw.launch`启动文件，修改机器人的IP地址为`10.192.1.2`，如下图所示：
+- Navigate to your workspace, find the `humanoid_hw.launch` startup file, and modify the robot's IP address to 10.192.1.2 as shown in the following figure:
 
   ![img](doc/humanoid_hw.png)
 
-- 完成修改后进行编译：
+- Compile after making the modifications:
 
     ```bash
-    # 如您安装了Conda，请临时禁用 Conda 环境
-    # 因为 Conda 会干扰 ROS 的运行环境设置
+    # If you have Conda installed, temporarily disable the Conda environment
+    # because Conda may interfere with ROS environment settings
     conda deactivate
     
-    # 设置ROS编译环境
+    # Set up the ROS compilation environment
     source /opt/ros/noetic/setup.bash
     
-    # 编译算法代码
+    # Compile the algorithm code
     cd ~/limx_ws/humanoid-rl-deploy-ros
     catkin_make install
     ```
 
-- 机器人准备工作：
+- Robot preparation:
 
-    - 请通过机器人左右肩膀的挂钩把机器人吊起来。
-    - 按电源键开机后，按下遥控器`右摇杆`按键，启动机器人电机。
-    - 按下遥控器按键 `L1 + START`切换到开发者模式。在此模式下，用户可以开发自己的运动控制算法。（此模式设置后，下次开机继续生效，如需退出开发者模式请按`L1 + L2 + START`退出）。
+    - Hang the robot using the hooks on its left and right shoulders.
+    - After pressing the power button to turn it on, press the `right joystick` button on the remote control to start the robot's motors.
+    - Press the remote control buttons `L1 + START` to switch to developer mode. In this mode, users can develop their own motion control algorithms. (This mode setting will remain effective after the next startup. To exit developer mode, press `L1 + L2 + START`.)
 
-- 实机部署运行。在Bash终端只需下面Shell命令启动控制算法：
+- Deploy and run on the real robot. In the Bash terminal, simply use the following Shell command to start the control algorithm:
 
   ```bash
-  # 如您安装了Conda，请临时禁用 Conda 环境
-  # 因为 Conda 会干扰 ROS 的运行环境设置
+  # If you have Conda installed, temporarily disable the Conda environment
+  # because Conda may interfere with ROS environment settings
   conda deactivate
   
-  # 设置ROS编译环境
+  # Set up the ROS compilation environment
   source /opt/ros/noetic/setup.bash
   
-  # 运行算法
+  # Run the algorithm
   cd ~/limx_ws/humanoid-rl-deploy-ros
   source install/setup.bash
   roslaunch robot_hw humanoid_hw.launch
   ```
 
-- 这时您可以通过遥控器按键`L1 + Y`让机器人进入站立模式。
+- At this point, you can press the remote control buttons `L1 + Y` to make the robot enter the standing mode.
 
-- 遥控器按`L1 + B`控制机器人打招呼。
+- Press `L1 + B` on the remote control to make the robot greet.

@@ -88,13 +88,6 @@ std::string HumanoidHW::findRunningController() {
     std::string running_controller = "NONE";
     controller_manager_msgs::ListControllers list_controllers;
     if (list_controllers_client_.call(list_controllers.request, list_controllers.response)) {
-        // list all controllers & states
-        std::stringstream ss;
-        ss << "List of controllers: \n";
-        for (auto const& ctrl : list_controllers.response.controller) {
-            ss << " - " << ctrl.name << " [" << ctrl.state << "]\n";
-        }
-        ROS_INFO("%s", ss.str().c_str());
         // list running controllers
         for (auto const& ctrl : list_controllers.response.controller) {
             if (ctrl.state == "running") {
