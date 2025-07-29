@@ -57,12 +57,22 @@
 - Download the MuJoCo simulator:
   ```Bash
   cd ~/limx_ws
+
+  # Option 1: HTTPS
+  git clone --recurse https://github.com/limxdynamics/humanoid-mujoco-sim.git
+  
+  # Option 2: SSH
   git clone --recurse git@github.com:limxdynamics/humanoid-mujoco-sim.git
   ```
   
 - Download the motion control algorithm:
   ```Bash
   cd ~/limx_ws
+  
+  # Option 1: HTTPS
+  git clone --recurse https://github.com/limxdynamics/humanoid-rl-deploy-ros.git
+
+  # Option 2: SSH
   git clone --recurse git@github.com:limxdynamics/humanoid-rl-deploy-ros.git
   ```
   
