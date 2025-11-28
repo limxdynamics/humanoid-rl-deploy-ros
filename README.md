@@ -225,6 +225,6 @@
   roslaunch robot_hw humanoid_hw.launch
   ```
 
-- At this point, you can press the remote control buttons `L1 + Y` to make the robot enter the standing mode.
+- At this point, you can press the remote control buttons `L1 + △` to make the robot enter the standing mode.
 
-- Press `L1 + B` on the remote control to make the robot greet.
+- Press `L1 + 〇` on the remote control to make the robot greet.
