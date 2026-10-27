@@ -1,14 +1,25 @@
-# English | [中文](README_cn.md)
+<p align="center">
+  <b>English</b> | <a href="README_cn.md">中文</a>
+</p>
 
 # Deployment of Training Results
 
-### 1. Deployment Environment Configuration
+Deploy trained reinforcement-learning policies on the LimX humanoid robots
+(`HU_D03_03`, `HU_D04_01`), either in MuJoCo simulation or on the real robot,
+under ROS Noetic.
 
-- Install ROS Noetic: We recommend setting up an algorithm development environment based on ROS Noetic on the Ubuntu 20.04 operating system. ROS provides a series of tools and libraries that greatly facilitate the development, testing, and deployment of robot algorithms. These resources offer users a rich and complete algorithm development environment.
+## 1. Deployment Environment Configuration
 
-  - For ROS Noetic installation, please refer to the documentation: https://wiki.ros.org/noetic/Installation/Ubuntu, and select "ros-noetic-desktop-full" for installation.
+- **Install ROS Noetic.** We recommend setting up the algorithm development
+  environment on Ubuntu 20.04 with ROS Noetic. ROS provides a set of tools and
+  libraries that greatly facilitate the development, testing and deployment of
+  robot algorithms.
 
-  - After installing ROS Noetic, enter the following Shell commands in the Bash terminal to install the libraries required for the development environment:
+  - Follow https://wiki.ros.org/noetic/Installation/Ubuntu and select
+    `ros-noetic-desktop-full`.
+
+  - Once ROS Noetic is installed, run the following in a Bash terminal to
+    install the libraries the development environment depends on:
 
     ```
     sudo apt-get update
@@ -32,53 +43,60 @@
                      python3-pip libboost-all-dev libtbb-dev liburdfdom-dev liborocos-kdl-dev -y
     ```
 
-- Install onnxruntime dependencies. Download link: https://github.com/microsoft/onnxruntime/releases/tag/v1.10.0. Please select the appropriate version according to your operating system and platform. For Ubuntu 20.04 x86_64, follow these steps for installation:
+- **Install the ONNX Runtime dependency.** Download it from
+  https://github.com/microsoft/onnxruntime/releases/tag/v1.10.0, choosing the
+  build that matches your operating system and platform. For Ubuntu 20.04
+  x86_64:
 
   ```
   wget https://github.com/microsoft/onnxruntime/releases/download/v1.10.0/onnxruntime-linux-x64-1.10.0.tgz
-  
+
   tar xvf onnxruntime-linux-x64-1.10.0.tgz
-  
+
   sudo cp -a onnxruntime-linux-x64-1.10.0/include/* /usr/include
   sudo cp -a onnxruntime-linux-x64-1.10.0/lib/* /usr/lib
   ```
 
-### 2. Create a Workspace
+## 2. Create a Workspace
 
- You can create an RL deployment development workspace by following these steps:
+Create an RL deployment workspace as follows:
 
-- Open a Bash terminal.
+- Create a directory to hold the workspace, for example `limx_ws` in your home
+  directory:
 
-- Create a new directory to store the workspace. For example, create a directory named "limx_ws" in the user's home directory:
-  ```Bash
+  ```bash
   mkdir -p ~/limx_ws
   ```
-  
+
 - Download the MuJoCo simulator:
-  ```Bash
+
+  ```bash
   cd ~/limx_ws
 
   # Option 1: HTTPS
   git clone --recurse https://github.com/limxdynamics/humanoid-mujoco-sim.git
-  
+
   # Option 2: SSH
   git clone --recurse git@github.com:limxdynamics/humanoid-mujoco-sim.git
   ```
-  
+
 - Download the motion control algorithm:
-  ```Bash
+
+  ```bash
   cd ~/limx_ws
-  
+
   # Option 1: HTTPS
   git clone --recurse https://github.com/limxdynamics/humanoid-rl-deploy-ros.git
 
   # Option 2: SSH
   git clone --recurse git@github.com:limxdynamics/humanoid-rl-deploy-ros.git
   ```
-  
-- Set the robot model: If it is not set yet, follow these steps:
-  - List available robot types with the Shell command  `tree -L 1 -P "humanoid_controllers" humanoid-rl-deploy-ros/robot_controllers/config/humanoid_controllers`:
-    
+
+- Set the robot model, if it has not been set yet:
+
+  - List the available robot types (`tree` comes from `sudo apt install tree`
+    if the command is missing):
+
     ```
     cd ~/limx_ws/humanoid-rl-deploy-ros/src
     tree -L 1 -P "humanoid_controllers" humanoid-rl-deploy-ros/robot_controllers/config/humanoid_controllers
@@ -86,145 +104,127 @@
     ├── HU_D03_03
     └── HU_D04_01
     ```
-    
-  - Taking `HU_D04_01` (replace with your actual robot type) as an example, set the robot model type:
-    
+
+  - Taking `HU_D04_01` as an example (substitute your actual robot type):
+
     ```
     echo 'export ROBOT_TYPE=HU_D04_01' >> ~/.bashrc && source ~/.bashrc
     ```
 
-### 3. Simulation Debugging
+## 3. Simulation Debugging
 
-- Run the MuJoCo simulator (Python 3.8 or higher is recommended):
+Each step below runs in its own Bash terminal. Every new terminal needs the ROS
+environment first, so run this once per terminal before any ROS command in this
+section or the next — their command blocks do not repeat it:
 
-  - Open a Bash terminal.
+```bash
+# If Conda is installed, temporarily disable it, because Conda interferes with
+# the ROS environment settings.
+conda deactivate
 
-  - Install the motion control development library:
-    - For Linux x86_64 environment:
-    
-      ```bash
-      cd ~/limx_ws
-      pip install humanoid-mujoco-sim/limxsdk-lowlevel/python3/amd64/limxsdk-*.whl
-      ```
-    
-    - For Linux aarch64 environment:
-    
-      ```bash
-      cd ~/limx_ws
-      pip install humanoid-mujoco-sim/limxsdk-lowlevel/python3/aarch64/limxsdk-*.whl
-      ```
-    
-  - Run the MuJoCo simulator:
-    
+# Set up the ROS environment.
+source /opt/ros/noetic/setup.bash
+```
+
+- **Run the MuJoCo simulator** (Python 3.8 or newer recommended):
+
+  - Install the motion control development library.
+
+    For Linux x86_64:
+
+    ```bash
+    cd ~/limx_ws
+    pip install humanoid-mujoco-sim/limxsdk-lowlevel/python3/amd64/limxsdk-*.whl
+    ```
+
+    For Linux aarch64:
+
+    ```bash
+    cd ~/limx_ws
+    pip install humanoid-mujoco-sim/limxsdk-lowlevel/python3/aarch64/limxsdk-*.whl
+    ```
+
+  - Run the simulator:
+
     ```bash
     cd ~/limx_ws
     python humanoid-mujoco-sim/simulator.py
     ```
 
-- Run the algorithm:
+- **Run the algorithm:**
 
-  - Open a Bash terminal.
+  - Go to your workspace and compile:
 
-  - Navigate to your workspace and complete the compilation:
-    
     ```bash
-    # If you have Conda installed, temporarily disable the Conda environment
-    # because Conda may interfere with ROS environment settings
-    conda deactivate
-    
-    # Set up the ROS compilation environment
-    source /opt/ros/noetic/setup.bash
-    
-    # Compile the algorithm code
     cd ~/limx_ws/humanoid-rl-deploy-ros
     catkin_make install
     ```
-    
-  - Run the algorithm:
-    
+
+  - Start it:
+
     ```bash
-    # If you have Conda installed, temporarily disable the Conda environment
-    # because Conda may interfere with ROS environment settings
-    conda deactivate
-    
-    # Set up the ROS compilation environment
-    source /opt/ros/noetic/setup.bash
-    
-    # Run the algorithm
     cd ~/limx_ws/humanoid-rl-deploy-ros
     source install/setup.bash
     roslaunch robot_hw humanoid_hw_sim.launch
     ```
-    
+
     ![](doc/simulator.gif)
 
-- Virtual Joystick: You can use a virtual joystick to operate the robot during simulation. Here are the specific steps to use the virtual joystick:
+- **Virtual joystick.** You can drive the robot with a virtual joystick while
+  the simulation is running.
 
-  - Open a Bash terminal.
-
-  - Run the virtual joystick:
+  - Start the virtual joystick:
 
     ```
     ~/limx_ws/humanoid-mujoco-sim/robot-joystick/robot-joystick
     ```
-    
+
     ![](doc/robot-joystick.png)
 
+  - You can now control the robot with it:
 
-  - At this point, you can use the virtual joystick to control the robot.
-  
-    | **Button** | **Mode**         | **Description**                                                    |
+    | **Button** | **Mode** | **Description** |
     | -------- | ---------------- | ----------------------------------------------------------- |
-    | L1+Y     | Switch to Stand Mode  | If the robot cannot stand, click "Reset" in the MuJoCo interface to reset it. |
-    | L1+B     | Switch to Greeting Mode |                                                             |
+    | L1+Y | Switch to Stand Mode | If the robot cannot stand, click "Reset" in the MuJoCo interface to reset it. |
+    | L1+B | Switch to Greeting Mode | |
 
-### 4. Real Robot Debugging
+## 4. Real Robot Debugging
 
-- Set your computer's IP: Ensure your computer is connected to the robot via the external network port. Set your computer's IP address to `10.192.1.200` and verify connectivity using the Shell command `ping 10.192.1.2`. Configure your development computer's IP as shown in the following figure:
+- **Set your computer's IP.** Make sure your computer is connected to the robot
+  through the external network port, set its IP address to `10.192.1.200`, and
+  verify connectivity with `ping 10.192.1.2`:
 
   ![img](doc/ip.png)
 
-- Navigate to your workspace, find the `humanoid_hw.launch` startup file, and modify the robot's IP address to 10.192.1.2 as shown in the following figure:
+- **Point the launch file at the robot.** Go to your workspace, open
+  `humanoid_hw.launch` and set the robot's IP address to `10.192.1.2`:
 
   ![img](doc/humanoid_hw.png)
 
-- Compile after making the modifications:
-
-    ```bash
-    # If you have Conda installed, temporarily disable the Conda environment
-    # because Conda may interfere with ROS environment settings
-    conda deactivate
-    
-    # Set up the ROS compilation environment
-    source /opt/ros/noetic/setup.bash
-    
-    # Compile the algorithm code
-    cd ~/limx_ws/humanoid-rl-deploy-ros
-    catkin_make install
-    ```
-
-- Robot preparation:
-
-    - Hang the robot using the hooks on its left and right shoulders.
-    - After pressing the power button to turn it on, press the `right joystick` button on the remote control to start the robot's motors.
-    - Press the remote control buttons `R1 + DOWN` to switch to developer mode. In this mode, users can develop their own motion control algorithms. (This mode setting will remain effective after the next startup. To exit developer mode, press `R1 + LEFT`.)
-
-- Deploy and run on the real robot. In the Bash terminal, simply use the following Shell command to start the control algorithm:
+- **Recompile** so that the edited launch file is installed:
 
   ```bash
-  # If you have Conda installed, temporarily disable the Conda environment
-  # because Conda may interfere with ROS environment settings
-  conda deactivate
-  
-  # Set up the ROS compilation environment
-  source /opt/ros/noetic/setup.bash
-  
-  # Run the algorithm
+  cd ~/limx_ws/humanoid-rl-deploy-ros
+  catkin_make install
+  ```
+
+- **Prepare the robot:**
+
+  - Hang the robot using the hooks on its left and right shoulders.
+  - Power it on, then press the `right joystick` button on the remote control to
+    start the robot's motors.
+  - Press `R1 + DOWN` to switch to developer mode, where you can develop your own
+    motion control algorithms. (This setting stays in effect after the next
+    startup; press `R1 + LEFT` to exit developer mode.)
+
+- **Deploy and run.** Start the control algorithm in a Bash terminal:
+
+  ```bash
   cd ~/limx_ws/humanoid-rl-deploy-ros
   source install/setup.bash
   roslaunch robot_hw humanoid_hw.launch
   ```
 
-- At this point, you can press the remote control buttons `L1 + △` to make the robot enter the standing mode.
+- Press `L1 + △` on the remote control to make the robot enter standing mode.
 
 - Press `L1 + 〇` on the remote control to make the robot greet.
