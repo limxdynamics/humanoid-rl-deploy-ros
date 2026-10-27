@@ -111,7 +111,7 @@
     
       ```bash
       cd ~/limx_ws
-      pip install humanoid-mujoco-sim/limxsdksdk-lowlevel/python3/aarch64/limxsdk-*.whl
+      pip install humanoid-mujoco-sim/limxsdk-lowlevel/python3/aarch64/limxsdk-*.whl
       ```
     
   - 运行 MuJoCo 仿真器：
