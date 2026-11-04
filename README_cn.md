@@ -4,6 +4,8 @@
 
 # 训练结果部署
 
+> **Oli 人形机器人开源生态的一部分。** 上手路线和其他 Oli 仓库：[Oli 快速上手](https://github.com/limxdynamics/limxdynamics/blob/main/doc/quickstart_cn.md#oli)。
+
 在 ROS Noetic 下把训练好的强化学习策略部署到 LimX 人形机器人（`HU_D03_03`、
 `HU_D04_01`），既可跑 MuJoCo 仿真，也可上真机。
 

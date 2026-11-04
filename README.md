@@ -4,6 +4,8 @@
 
 # Deployment of Training Results
 
+> **Part of the Oli humanoid open-source ecosystem.** Where to start and the other Oli repositories: [Oli quick start](https://github.com/limxdynamics/limxdynamics/blob/main/doc/quickstart.md#oli).
+
 Deploy trained reinforcement-learning policies on the LimX humanoid robots
 (`HU_D03_03`, `HU_D04_01`), either in MuJoCo simulation or on the real robot,
 under ROS Noetic.
