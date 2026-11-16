@@ -1,4 +1,8 @@
 <p align="center">
+  <img src="doc/humanoid-rl-deploy-ros-banner.png" alt="humanoid-rl-deploy-ros：LimX Oli 人形机器人的阻尼、站立、打招呼三种模式，均由手柄切换" width="100%">
+</p>
+
+<p align="center">
   <a href="README.md">English</a> | <b>中文</b>
 </p>
 
@@ -18,7 +22,35 @@
 在 ROS Noetic 下把训练好的强化学习策略部署到 LimX 人形机器人（`HU_D03_03`、
 `HU_D04_01`），既可跑 MuJoCo 仿真，也可上真机。
 
-## 1、部署环境配置
+## 亮点
+
+- **自带训练好的策略。** 每个机器人型号都附带一个 ONNX 策略和两个编码器，驱动全部 31 个关节，无需训练就能看到机器人动起来。
+- **仿真与真机同一套控制器。** `humanoid_hw_sim.launch` 连接 `127.0.0.1` 上的 [`humanoid-mujoco-sim`](https://github.com/limxdynamics/humanoid-mujoco-sim)；`humanoid_hw.launch` 连接 `10.192.1.2` 上的真机。
+- **手柄切换三种模式。** 阻尼、站立和 RL 打招呼动作是三个独立的 `ros_control` 控制器，用 `L1` 组合键切换；`L1 + X` 全部停止。
+- **方便扩展自己的控制器。** 在 `robot_controllers` 中仿照 `StandHumanoidController`、`MimicHumanoidController` 新增控制器，并在 `controllers.yaml` 中注册即可。
+
+## 机器人型号
+
+| | 型号 | 说明 | 驱动自由度 | `ROBOT_TYPE` |
+| :-: | --- | --- | :-: | --- |
+| <img src="doc/model-hu-d04.png" width="320" alt="LimX Oli HU_D04"> | **Oli（HU_D04）** | 全尺寸人形：腿部各 6 自由度，腰部 3、头部 2、手臂各 7 自由度 | 31 | `HU_D04_01` |
+| <img src="doc/model-hu-d03.png" width="320" alt="LimX HU_D03"> | **HU_D03**（已停产） | 上一代全尺寸人形，同样为 31 个驱动关节 | 31 | `HU_D03_03` |
+
+关节数来自 `robot_hw/config/<ROBOT_TYPE>.yaml`。图片由 [`humanoid-description`](https://github.com/limxdynamics/humanoid-description) 的 MuJoCo 模型以同一相机和灯光渲染。
+
+## 工作原理
+
+<p align="center">
+  <img src="doc/humanoid-rl-deploy-ros-modes-cn.png" alt="三个 ros_control 控制器：阻尼（L1+A，位置增益为零）、站立（L1+Y，PD 到站立姿态）、打招呼（L1+B，RL 策略复现 764 帧打招呼动作）；L1+X 停止控制器并退出" width="100%">
+</p>
+
+<p align="center">
+  <img src="doc/humanoid-rl-deploy-ros-control-loop-cn.png" alt="打招呼模式：IMU 和 31 个关节组成 100 维观测；最近 10 帧观测分别输入 lin_encoder.onnx（1000 到 3）和 priv_encoder.onnx（1000 到 32）；policy.onnx 将 138 维输入映射为 31 个关节目标；硬件循环 1000 Hz，策略 100 Hz" width="100%">
+</p>
+
+## 安装与运行
+
+### 1、部署环境配置
 
 - **安装 ROS Noetic。** 我们推荐在 Ubuntu 20.04 上搭建基于 ROS Noetic 的算法
   开发环境。ROS 提供了一系列工具和库，极大便利了机器人算法的开发、测试和部署。
@@ -28,7 +60,7 @@
 
   - ROS Noetic 安装完成后，Bash 终端执行以下命令安装开发环境所依赖的库：
 
-    ```
+    ```bash
     sudo apt-get update
     sudo apt install ros-noetic-urdf \
                      ros-noetic-kdl-parser \
@@ -54,7 +86,7 @@
   https://github.com/microsoft/onnxruntime/releases/tag/v1.10.0 下载，按自己的
   操作系统和平台选择对应版本。Ubuntu 20.04 x86_64 按以下步骤安装：
 
-  ```
+  ```bash
   wget https://github.com/microsoft/onnxruntime/releases/download/v1.10.0/onnxruntime-linux-x64-1.10.0.tgz
 
   tar xvf onnxruntime-linux-x64-1.10.0.tgz
@@ -63,7 +95,7 @@
   sudo cp -a onnxruntime-linux-x64-1.10.0/lib/* /usr/lib
   ```
 
-## 2、创建工作空间
+### 2、创建工作空间
 
 按以下步骤创建 RL 部署开发工作空间：
 
@@ -112,11 +144,11 @@
 
   - 以 `HU_D04_01` 为例（请替换为实际机器人类型）：
 
-    ```
+    ```bash
     echo 'export ROBOT_TYPE=HU_D04_01' >> ~/.bashrc && source ~/.bashrc
     ```
 
-## 3、仿真调试
+### 3、仿真调试
 
 以下每个步骤各用一个终端。每个新终端在跑本节或下一节的任何 ROS 命令之前，都要
 先执行一次下面的准备命令 —— 后续命令块不再重复：
@@ -171,7 +203,7 @@ source /opt/ros/noetic/setup.bash
     roslaunch robot_hw humanoid_hw_sim.launch
     ```
 
-    ![](doc/simulator.gif)
+    ![人形机器人策略在 MuJoCo 仿真器中运行，由虚拟遥控器操作](doc/simulator.gif)
 
 - **虚拟遥控器。** 仿真运行期间可以用虚拟遥控器操作机器人。
 
@@ -181,7 +213,7 @@ source /opt/ros/noetic/setup.bash
     ~/limx_ws/humanoid-mujoco-sim/robot-joystick/robot-joystick
     ```
 
-    ![](doc/robot-joystick.png)
+    ![虚拟遥控器窗口](doc/robot-joystick.png)
 
   - 这时就可以用虚拟遥控器控制机器人了：
 
@@ -189,8 +221,10 @@ source /opt/ros/noetic/setup.bash
     | -------- | ---------------- | ----------------------------------------------------------- |
     | L1+Y | 切换到站立模式 | 如机器人没法站立，请点击 MuJoCo 界面中的“Reset”复位一下。 |
     | L1+B | 切换到打招呼模式 | |
+    | L1+A | 切换到阻尼模式 | 关节只有阻尼，机器人无法自行站稳。 |
+    | L1+X | 停止 | 停止控制器并退出节点。 |
 
-## 4、真机调试
+### 4、真机调试
 
 - **设置电脑 IP。** 确保电脑与机器人本体通过外置网口连接，把电脑 IP 设为
   `10.192.1.200`，并用 `ping 10.192.1.2` 确认能正常 ping 通：
@@ -227,3 +261,7 @@ source /opt/ros/noetic/setup.bash
 - 这时可以通过遥控器按键 `L1 + △` 让机器人进入站立模式。
 
 - 遥控器按 `L1 + 〇` 控制机器人打招呼。
+
+## 许可证
+
+见 [LICENSE](LICENSE)。随附的子模块说明见 [NOTICE](NOTICE)。
