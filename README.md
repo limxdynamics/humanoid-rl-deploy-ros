@@ -229,7 +229,7 @@ source /opt/ros/noetic/setup.bash
     | **Button** | **Mode** | **Description** |
     | -------- | ---------------- | ----------------------------------------------------------- |
     | L1+Y | Switch to Stand Mode | If the robot cannot stand, click "Reset" in the MuJoCo interface to reset it. |
-    | L1+B | Switch to Greeting Mode | |
+    | L1+B | Switch to Greeting Mode | Runs the bundled RL policy: the robot waves for about 7.6 s (764 frames), then keeps standing. |
     | L1+A | Switch to Damping Mode | Joints are only damped; the robot will not hold itself up. |
     | L1+X | Stop | Stops the controller and exits the node. |
 
