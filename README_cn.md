@@ -203,7 +203,7 @@ source /opt/ros/noetic/setup.bash
     roslaunch robot_hw humanoid_hw_sim.launch
     ```
 
-    ![人形机器人策略在 MuJoCo 仿真器中运行，由虚拟遥控器操作](doc/simulator.gif)
+    ![Oli（HU_D04_01）在 MuJoCo 中先站立，再运行仓库自带的打招呼策略](doc/simulator.gif)
 
 - **虚拟遥控器。** 仿真运行期间可以用虚拟遥控器操作机器人。
 
@@ -231,17 +231,7 @@ source /opt/ros/noetic/setup.bash
 
   ![img](doc/ip.png)
 
-- **修改启动文件。** 进入工作空间，找到 `humanoid_hw.launch`，把机器人 IP 改为
-  `10.192.1.2`：
-
-  ![img](doc/humanoid_hw.png)
-
-- **重新编译**，让修改后的启动文件安装到 `install` 空间：
-
-  ```bash
-  cd ~/limx_ws/humanoid-rl-deploy-ros
-  catkin_make install
-  ```
+- `humanoid_hw.launch` 默认已连接 `10.192.1.2` 上的机器人，无需修改启动文件或重新编译。
 
 - **机器人准备：**
 

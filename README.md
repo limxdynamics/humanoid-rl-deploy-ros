@@ -211,7 +211,7 @@ source /opt/ros/noetic/setup.bash
     roslaunch robot_hw humanoid_hw_sim.launch
     ```
 
-    ![Humanoid policy running in the MuJoCo simulator, driven by the virtual joystick](doc/simulator.gif)
+    ![Oli (HU_D04_01) in MuJoCo: Stand, then the bundled greeting policy](doc/simulator.gif)
 
 - **Virtual joystick.** You can drive the robot with a virtual joystick while
   the simulation is running.
@@ -241,17 +241,8 @@ source /opt/ros/noetic/setup.bash
 
   ![img](doc/ip.png)
 
-- **Point the launch file at the robot.** Go to your workspace, open
-  `humanoid_hw.launch` and set the robot's IP address to `10.192.1.2`:
-
-  ![img](doc/humanoid_hw.png)
-
-- **Recompile** so that the edited launch file is installed:
-
-  ```bash
-  cd ~/limx_ws/humanoid-rl-deploy-ros
-  catkin_make install
-  ```
+- `humanoid_hw.launch` already connects to the robot at `10.192.1.2`, so no
+  launch-file change or rebuild is needed.
 
 - **Prepare the robot:**
 
